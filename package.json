@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "commander": "^15.0.0",
+    "ink": "^7.1.1",
+    "react": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  },
+  "name": "outhost",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [],
+  "type": "module"
+}
