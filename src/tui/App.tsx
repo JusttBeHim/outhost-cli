@@ -1,74 +1,31 @@
 import React, { useState } from "react";
-import { Box, Text, useApp, useInput } from "ink";
-
-interface HistoryItem {
-  command: string;
-  response: string;
-}
+import { Box, Text, useApp, useInput, useWindowSize } from "ink";
 
 export default function App() {
   const { exit } = useApp();
+  const { columns } = useWindowSize();
   const [input, setInput] = useState("");
-  const [showHelp, setShowHelp] = useState(false);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   useInput((char, key) => {
-    // Clean exit on Ctrl+C or Escape
+    // Ctrl+C exits the TUI
     if (key.ctrl && char === "c") {
       exit();
       return;
     }
 
-    if (key.escape) {
-      if (showHelp) {
-        setShowHelp(false);
-        return;
-      }
-      exit();
-      return;
-    }
-
-    // Toggle help on '?' when input buffer is empty
-    if (char === "?" && input.length === 0) {
-      setShowHelp((prev) => !prev);
-      return;
-    }
-
-    // Backspace / Delete handling
+    // Backspace / Delete removes characters
     if (key.backspace || key.delete) {
       setInput((prev) => prev.slice(0, -1));
       return;
     }
 
-    // Return (Enter) handling
+    // Enter clears current input
     if (key.return) {
-      const trimmed = input.trim();
-      if (trimmed.length === 0) {
-        return;
-      }
-
-      if (trimmed === "exit" || trimmed === "quit" || trimmed === "q") {
-        exit();
-        return;
-      }
-
-      if (trimmed === "clear") {
-        setHistory([]);
-        setInput("");
-        return;
-      }
-
-      if (trimmed === "help" || trimmed === "?") {
-        setShowHelp((prev) => !prev);
-      }
-
-      // Display typed command in terminal history
-      setHistory((prev) => [...prev, { command: trimmed, response: trimmed }]);
       setInput("");
       return;
     }
 
-    // Printable characters
+    // Printable characters appear after >
     if (
       char &&
       !key.ctrl &&
@@ -81,46 +38,32 @@ export default function App() {
     }
   });
 
+  const width = columns && columns > 0 ? columns : 80;
+  const horizontalLine = "─".repeat(width);
+
   return (
-    <Box
-      flexDirection="column"
-      borderStyle="round"
-      borderColor="cyan"
-      paddingLeft={2}
-      paddingRight={2}
-      paddingTop={1}
-      width="100%"
-    >
-      {/* Top Identity Area — brand mark is the actual glyph, no ASCII art needed */}
+    <Box flexDirection="column" width="100%">
+      {/* Top Branding Area */}
       <Box flexDirection="row" justifyContent="space-between" width="100%">
         <Box>
           <Text bold color="cyan">
-            &gt;_ OUTHOST
+            OUTHOST
           </Text>
-          <Text color="gray"> v0.1</Text>
+          <Text color="gray"> v1</Text>
         </Box>
-        <Box>
-          <Text color="green">● </Text>
-          <Text dimColor>Coming soon</Text>
-        </Box>
+        <Text color="green">● ONLINE</Text>
       </Box>
       <Text color="gray">Personal Hosting Server</Text>
 
-      {/* Terminal Command History */}
-      {history.map((item, index) => (
-        <Box key={index} flexDirection="column" marginTop={1}>
-          <Box>
-            <Text color="cyan" bold>
-              &gt;{" "}
-            </Text>
-            <Text color="white">{item.command}</Text>
-          </Box>
-          <Text color="gray">{item.response}</Text>
-        </Box>
-      ))}
+      {/* Horizontal line above prompt */}
+      <Box marginTop={2}>
+        <Text color="gray" wrap="truncate">
+          {horizontalLine}
+        </Text>
+      </Box>
 
       {/* Interactive Command Prompt */}
-      <Box marginTop={1}>
+      <Box>
         <Text color="cyan" bold>
           &gt;{" "}
         </Text>
@@ -128,12 +71,10 @@ export default function App() {
         <Text color="cyan">█</Text>
       </Box>
 
-      {/* Minimal Footer Hint */}
-      {!showHelp && history.length === 0 && input.length === 0 && (
-        <Box marginTop={1}>
-          <Text dimColor>? for help · Ctrl+C to exit</Text>
-        </Box>
-      )}
+      {/* Horizontal line below prompt */}
+      <Text color="gray" wrap="truncate">
+        {horizontalLine}
+      </Text>
     </Box>
   );
 }
