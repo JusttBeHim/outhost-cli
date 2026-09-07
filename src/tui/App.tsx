@@ -51,7 +51,7 @@ export default function App() {
           </Text>
           <Text color="gray"> v1</Text>
         </Box>
-        <Text color="green">● ONLINE</Text>
+        <Text color="green">● Comming Soon</Text>
       </Box>
       <Text color="gray">Personal Hosting Server</Text>
 
