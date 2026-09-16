@@ -1,27 +1,35 @@
 {
-  "dependencies": {
-    "commander": "^15.0.0",
-    "ink": "^7.1.1",
-    "react": "^19.2.8"
-  },
-  "devDependencies": {
-    "@types/node": "^26.4.1",
-    "@types/react": "^19.2.18",
-    "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
-  },
   "name": "outhost",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "outhost": "./dist/Outhost.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx src/index.ts",
+    "dev": "tsx src/Outhost.ts",
     "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JusttBeHim/Outhost-Cli.git"
   },
   "keywords": [],
   "type": "module",
-  "bin": {
-    "outhost": "dist/index.js"
+  "bugs": {
+    "url": "https://github.com/JusttBeHim/Outhost-Cli/issues"
+  },
+  "homepage": "https://github.com/JusttBeHim/Outhost-Cli#readme",
+  "dependencies": {
+    "commander": "^15.0.0",
+    "ink": "^7.1.1",
+    "react": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "@types/react": "^19.3.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   }
 }
