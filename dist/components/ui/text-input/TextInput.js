@@ -57,6 +57,6 @@ const FocusedInput = ({ value, onChange, onSubmit, placeholder = '', password = 
 export const TextInput = ({ value, onChange, onSubmit, placeholder = '', password = false, focus = true, label, theme = darkTheme, }) => {
     const { isRawModeSupported } = useStdin();
     const canFocus = focus && isRawModeSupported;
-    return (_jsxs(Box, { children: [label ? _jsxs(Text, { color: theme.colors.muted, children: [label, " "] }) : null, _jsx(Text, { color: theme.colors.border, children: '❯ ' }), canFocus ? (_jsx(FocusedInput, { value: value, onChange: onChange, onSubmit: onSubmit, placeholder: placeholder, password: password, focus: focus, theme: theme })) : (_jsx(InputDisplay, { value: value, placeholder: placeholder, password: password, isFocused: false, cursor: value.length, theme: theme }))] }));
+    return (_jsxs(Box, { children: [label ? _jsxs(Text, { color: theme.colors.muted, children: [label, " "] }) : null, _jsx(Text, { color: theme.colors.border, children: '❯ ' }), canFocus ? (onSubmit ? (_jsx(FocusedInput, { value: value, onChange: onChange, onSubmit: onSubmit, placeholder: placeholder, password: password, focus: focus, theme: theme })) : (_jsx(FocusedInput, { value: value, onChange: onChange, placeholder: placeholder, password: password, focus: focus, theme: theme }))) : (_jsx(InputDisplay, { value: value, placeholder: placeholder, password: password, isFocused: false, cursor: value.length, theme: theme }))] }));
 };
 //# sourceMappingURL=TextInput.js.map
