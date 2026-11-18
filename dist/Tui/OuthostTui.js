@@ -1,4 +1,4 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React, { useState, useEffect } from "react";
 import { Box, Text, useInput, useApp, useWindowSize } from "ink";
 import { Select } from "../components/ui/select/index.js";
@@ -8,6 +8,8 @@ import { Spinner } from "../components/ui/spinner/index.js";
 import { StatusIndicator } from "../components/ui/status-indicator/index.js";
 import { Deployment } from "../deploy/deployment.js";
 import { TextInput } from "../components/ui/text-input/index.js";
+import { Help } from "../Commands/Help.js";
+import { Status } from "../Commands/Status.js";
 const outhostTheme = {
     ...darkTheme,
     colors: {
@@ -16,6 +18,15 @@ const outhostTheme = {
         focus: "#a855f7",
     },
 };
+function getStatusColor(code) {
+    if (code >= 200 && code < 300)
+        return 'green';
+    if (code >= 300 && code < 400)
+        return 'cyan';
+    if (code >= 400 && code < 500)
+        return 'yellow';
+    return 'red';
+}
 const SELECT_ITEMS = [
     { label: "Deploy Project", value: "deploy" },
     { label: "Help & Commands", value: "help" },
@@ -35,6 +46,8 @@ function Header({ columns }) {
 }
 export function Outhost() {
     const [notification, setNotification] = useState(null);
+    const [showHelp, setShowHelp] = useState(false);
+    const [showStatus, setShowStatus] = useState(false);
     const [deployStep, setDeployStep] = useState('NONE');
     const [pathInput, setPathInput] = useState('');
     const [deployState, setDeployState] = useState(null);
@@ -62,6 +75,14 @@ export function Outhost() {
     useInput((input, key) => {
         if (input === "q" || input === "Q") {
             handleExit();
+            return;
+        }
+        if (showHelp && (input === "b" || input === "B" || key.escape)) {
+            setShowHelp(false);
+            return;
+        }
+        if (showStatus && (input === "b" || input === "B" || key.escape)) {
+            setShowStatus(false);
             return;
         }
     });
@@ -92,24 +113,30 @@ export function Outhost() {
         }
         else if (item.value === "deploy") {
             setNotification(null);
+            setShowHelp(false);
+            setShowStatus(false);
             setDeployStep('SELECT_MODE');
         }
         else if (item.value === "help") {
             setDeployState(null);
-            setNotification("Help overview active. Run 'outhost --help' in terminal for more info.");
+            setNotification(null);
+            setShowStatus(false);
+            setShowHelp(true);
         }
         else if (item.value === "status") {
             setDeployState(null);
-            setNotification("Local environment status verified. All systems nominal.");
+            setNotification(null);
+            setShowHelp(false);
+            setShowStatus(true);
         }
     };
-    return (_jsxs(Box, { flexDirection: "column", paddingX: 1, paddingY: 1, children: [_jsx(Header, { columns: columns }), deployStep === 'NONE' && (_jsxs(Box, { flexDirection: "column", marginY: 1, children: [_jsx(Text, { bold: true, color: "#6d0bc9", children: "NAVIGATION" }), _jsx(Box, { marginTop: 1, children: _jsx(Select, { items: SELECT_ITEMS, onSelect: handleSelect, theme: outhostTheme }) })] })), deployStep === 'SELECT_MODE' && (_jsxs(Box, { flexDirection: "column", marginY: 1, children: [_jsx(Text, { bold: true, color: "#6d0bc9", children: "Where do you want to deploy?" }), _jsx(Box, { marginTop: 1, children: _jsx(Select, { items: [
-                                { label: 'Select this directory', value: 'cwd' },
-                                { label: 'Enter path', value: 'path' }
-                            ], onSelect: handleDeployModeSelect, theme: outhostTheme }) })] })), deployStep === 'ENTER_PATH' && (_jsx(Box, { flexDirection: "column", marginY: 1, children: _jsx(TextInput, { label: "Directory Path:", placeholder: "/path/to/website", value: pathInput, onChange: setPathInput, onSubmit: handlePathSubmit, focus: true, theme: outhostTheme }) })), deployStep === 'DEPLOYING' && deployState && (_jsx(Box, { flexDirection: "column", marginY: 1, children: deployState.state === "DEPLOYED" ? (_jsxs(Box, { flexDirection: "column", children: [_jsx(StatusIndicator, { status: "online", label: "Deployment successful", theme: outhostTheme }), _jsxs(Box, { flexDirection: "column", marginTop: 1, paddingLeft: 2, children: [_jsxs(Text, { children: [_jsx(Text, { color: "gray", children: "Local:  " }), _jsx(Text, { color: "cyan", children: deployState.localUrl })] }), _jsxs(Text, { children: [_jsx(Text, { color: "gray", children: "Public: " }), _jsx(Text, { color: "#a855f7", bold: true, children: deployState.publicUrl })] })] }), _jsx(Box, { marginTop: 1, children: _jsx(Text, { color: "gray", children: "Press Q to stop the deployment and quit." }) })] })) : deployState.state === "FAILED" ? (_jsx(StatusIndicator, { status: "error", label: deployState.message || "Deployment failed", theme: outhostTheme })) : (_jsx(Box, { flexDirection: "row", children: _jsx(Spinner, { label: deployState.message || "", theme: outhostTheme }) })) })), notification && deployStep === 'NONE' && (_jsx(Box, { marginY: 1, children: _jsxs(Text, { color: "yellow", children: ["\u2139 ", notification] }) })), _jsx(Box, { marginTop: 1, children: _jsx(KeyHint, { keys: [
-                        { key: "↑↓", label: "Move" },
-                        { key: "Enter", label: "Select" },
-                        { key: "q", label: "Quit" },
-                    ], theme: outhostTheme }) })] }));
+    return (_jsxs(Box, { flexDirection: "column", paddingX: 1, paddingY: 1, children: [_jsx(Header, { columns: columns }), showHelp ? (_jsx(Help, { onBack: () => setShowHelp(false) })) : showStatus ? (_jsx(Status, { onBack: () => setShowStatus(false) })) : (_jsxs(_Fragment, { children: [deployStep === 'NONE' && (_jsxs(Box, { flexDirection: "column", marginY: 1, children: [_jsx(Text, { bold: true, color: "#6d0bc9", children: "NAVIGATION" }), _jsx(Box, { marginTop: 1, children: _jsx(Select, { items: SELECT_ITEMS, onSelect: handleSelect, theme: outhostTheme }) })] })), deployStep === 'SELECT_MODE' && (_jsxs(Box, { flexDirection: "column", marginY: 1, children: [_jsx(Text, { bold: true, color: "#6d0bc9", children: "Where do you want to deploy?" }), _jsx(Box, { marginTop: 1, children: _jsx(Select, { items: [
+                                        { label: 'Select this directory', value: 'cwd' },
+                                        { label: 'Enter path', value: 'path' }
+                                    ], onSelect: handleDeployModeSelect, theme: outhostTheme }) })] })), deployStep === 'ENTER_PATH' && (_jsx(Box, { flexDirection: "column", marginY: 1, children: _jsx(TextInput, { label: "Directory Path:", placeholder: "/path/to/website", value: pathInput, onChange: setPathInput, onSubmit: handlePathSubmit, focus: true, theme: outhostTheme }) })), deployStep === 'DEPLOYING' && deployState && (_jsx(Box, { flexDirection: "column", marginY: 1, children: deployState.state === "DEPLOYED" ? (_jsxs(Box, { flexDirection: "column", children: [_jsx(StatusIndicator, { status: "online", label: "Deployment successful", theme: outhostTheme }), _jsxs(Box, { flexDirection: "column", marginTop: 1, paddingLeft: 2, children: [deployState.targetPath && (_jsxs(Text, { children: [_jsx(Text, { color: "gray", children: "Directory: " }), _jsx(Text, { color: "yellow", children: deployState.targetPath })] })), _jsxs(Text, { children: [_jsx(Text, { color: "gray", children: "Local:     " }), _jsx(Text, { color: "cyan", children: deployState.localUrl })] }), _jsxs(Text, { children: [_jsx(Text, { color: "gray", children: "Public:    " }), _jsx(Text, { color: "#a855f7", bold: true, children: deployState.publicUrl })] }), _jsxs(Text, { children: [_jsx(Text, { color: "gray", children: "Live Reload: " }), _jsx(Text, { color: "green", children: "Active" })] })] }), _jsxs(Box, { flexDirection: "column", marginTop: 1, children: [_jsx(Text, { bold: true, color: "#6d0bc9", children: "REQUEST LOGS" }), _jsx(Box, { flexDirection: "column", marginTop: 1, paddingLeft: 2, children: !deployState.logs || deployState.logs.length === 0 ? (_jsx(Text, { color: "gray", children: "Waiting for incoming requests..." })) : (deployState.logs.slice(-6).map((log) => (_jsxs(Box, { flexDirection: "row", gap: 1, children: [_jsx(Text, { color: "gray", children: log.timestamp }), _jsx(Text, { color: "cyan", bold: true, children: log.method.padEnd(4) }), _jsx(Text, { color: getStatusColor(log.statusCode), bold: true, children: log.statusCode }), _jsx(Text, { color: "white", children: log.path }), _jsxs(Text, { color: "gray", children: ["(", log.durationMs, "ms)"] })] }, log.id)))) })] }), _jsx(Box, { marginTop: 1, children: _jsx(Text, { color: "gray", children: "Press Q to stop the deployment and quit." }) })] })) : deployState.state === "FAILED" ? (_jsx(StatusIndicator, { status: "error", label: deployState.message || "Deployment failed", theme: outhostTheme })) : (_jsxs(Box, { flexDirection: "column", children: [_jsx(Box, { flexDirection: "row", children: _jsx(Spinner, { label: deployState.message || "", theme: outhostTheme }) }), deployState.targetPath && (_jsxs(Box, { marginTop: 1, paddingLeft: 2, children: [_jsx(Text, { color: "gray", children: "Directory: " }), _jsx(Text, { color: "yellow", children: deployState.targetPath })] }))] })) })), notification && deployStep === 'NONE' && (_jsx(Box, { marginY: 1, children: _jsxs(Text, { color: "yellow", children: ["\u2139 ", notification] }) })), _jsx(Box, { marginTop: 1, children: _jsx(KeyHint, { keys: [
+                                { key: "↑↓", label: "Move" },
+                                { key: "Enter", label: "Select" },
+                                { key: "q", label: "Quit" },
+                            ], theme: outhostTheme }) })] }))] }));
 }
 //# sourceMappingURL=OuthostTui.js.map
